@@ -1,0 +1,55 @@
+{
+  "name": "fhevm-base-template",
+  "version": "1.0.0",
+  "description": "Base template for FHEVM membership example development",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:debug": "hardhat test --verbose",
+    "coverage": "hardhat coverage",
+    "lint": "solhint 'contracts/**/*.sol'",
+    "clean": "hardhat clean",
+    "node": "hardhat node",
+    "deploy": "hardhat deploy"
+  },
+  "devDependencies": {
+    "@fhevm/hardhat-plugin": "^0.3.0-1",
+    "@fhevm/solidity": "^0.9.1",
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.6",
+    "@nomicfoundation/hardhat-ethers": "^3.0.5",
+    "@nomicfoundation/hardhat-verify": "^2.0.7",
+    "@typechain/ethers-v6": "^11.1.2",
+    "@typechain/hardhat": "^9.1.0",
+    "@types/chai": "^4.3.11",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.10.6",
+    "@typescript-eslint/eslint-plugin": "^6.17.0",
+    "@typescript-eslint/parser": "^6.17.0",
+    "chai": "^4.3.10",
+    "dotenv": "^16.3.1",
+    "eslint": "^8.56.0",
+    "ethers": "^6.10.0",
+    "hardhat": "^2.21.0",
+    "hardhat-deploy": "^0.11.46",
+    "hardhat-gas-reporter": "^1.0.9",
+    "solhint": "^4.0.0",
+    "solidity-coverage": "^0.8.5",
+    "ts-node": "^10.9.2",
+    "typechain": "^8.3.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0",
+    "@zama-fhe/relayer-sdk": "^0.1.0",
+    "encrypted-types": "^1.0.0"
+  },
+  "keywords": [
+    "ethereum",
+    "hardhat",
+    "fhevm",
+    "privacy",
+    "homomorphic-encryption"
+  ],
+  "author": "FHEVM Developer Community",
+  "license": "BSD-3-Clause-Clear"
+}
