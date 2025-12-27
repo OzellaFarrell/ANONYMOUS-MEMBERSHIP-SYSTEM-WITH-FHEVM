@@ -91,6 +91,7 @@ contract UserDecryptSingleValue is ZamaEthereumConfig {
   function clearSecret() external {
     require(hasSecret[msg.sender], "UserDecryptSingleValue: no secret");
     hasSecret[msg.sender] = false;
-    delete userSecrets[msg.sender];
+    // Set to zero value since encrypted types cannot be deleted
+    userSecrets[msg.sender] = FHE.asEuint32(0);
   }
 }

@@ -8,11 +8,14 @@ import { ZamaEthereumConfig } from "@fhevm/solidity/config/ZamaConfig.sol";
 /// @notice A basic privacy-preserving membership contract
 /// @dev Demonstrates encrypted member registration and status tracking
 contract SimpleMembership is ZamaEthereumConfig {
+  /// @notice Track membership status (plaintext flag)
+  mapping(address => bool) private isMemberStatus;
+
   /// @notice Encrypted membership status
   mapping(address => euint32) private memberStatus;
 
-  /// @notice Encrypted member count (private)
-  euint32 private totalMembers;
+  /// @notice Plaintext member count for external reference
+  uint32 private totalMembersCount;
 
   /// @notice Events
   event MemberRegistered(address indexed member);
@@ -20,30 +23,28 @@ contract SimpleMembership is ZamaEthereumConfig {
 
   /// @notice Initialize the contract
   constructor() {
-    totalMembers = FHE.asEuint32(0);
+    totalMembersCount = 0;
   }
 
   /// @notice Register a new member with encrypted status
   /// @param encryptedStatus Encrypted membership status (0 = inactive, 1 = active)
   /// @param inputProof Zero-knowledge proof for the encrypted input
   function registerMember(externalEuint32 encryptedStatus, bytes calldata inputProof) external {
-    require(memberStatus[msg.sender] == 0, "SimpleMembership: already registered");
+    require(!isMemberStatus[msg.sender], "SimpleMembership: already registered");
 
     // Convert external encrypted value to internal representation
     euint32 status = FHE.fromExternal(encryptedStatus, inputProof);
 
     // Store encrypted member status
     memberStatus[msg.sender] = status;
+    isMemberStatus[msg.sender] = true;
 
-    // Increment total members (example of encrypted operation)
-    totalMembers = FHE.add(totalMembers, FHE.asEuint32(1));
+    // Increment total members count
+    totalMembersCount++;
 
     // Grant permissions for the contract and caller
     FHE.allowThis(memberStatus[msg.sender]);
     FHE.allow(memberStatus[msg.sender], msg.sender);
-
-    // Grant permissions for total members
-    FHE.allowThis(totalMembers);
 
     emit MemberRegistered(msg.sender);
   }
@@ -52,7 +53,7 @@ contract SimpleMembership is ZamaEthereumConfig {
   /// @param newStatus Encrypted new status value
   /// @param inputProof Zero-knowledge proof for the encrypted input
   function updateMemberStatus(externalEuint32 newStatus, bytes calldata inputProof) external {
-    require(memberStatus[msg.sender] != 0, "SimpleMembership: not a member");
+    require(isMemberStatus[msg.sender], "SimpleMembership: not a member");
 
     // Convert external encrypted value
     euint32 status = FHE.fromExternal(newStatus, inputProof);
@@ -70,21 +71,19 @@ contract SimpleMembership is ZamaEthereumConfig {
   /// @notice Get encrypted member status (only callable by the member)
   /// @return Encrypted member status
   function getMemberStatus() external view returns (euint32) {
-    require(memberStatus[msg.sender] != 0, "SimpleMembership: not a member");
+    require(isMemberStatus[msg.sender], "SimpleMembership: not a member");
     return memberStatus[msg.sender];
   }
 
-  /// @notice Check if address is a registered member (encrypted check)
-  /// @return Boolean indicating membership
+  /// @notice Check if address is a registered member
+  /// @return Boolean indicating membership status
   function isMember(address member) external view returns (bool) {
-    // Note: This returns encrypted boolean - requires decryption
-    // In practice, this would need proper access control
-    return memberStatus[member] != 0;
+    return isMemberStatus[member];
   }
 
-  /// @notice Get total encrypted member count
-  /// @return Encrypted total members
-  function getTotalMembers() external view returns (euint32) {
-    return totalMembers;
+  /// @notice Get total plaintext member count
+  /// @return Total member count
+  function getTotalMembers() external view returns (uint32) {
+    return totalMembersCount;
   }
 }

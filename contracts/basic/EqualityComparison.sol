@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause-Clear
 pragma solidity ^0.8.24;
 
-import { FHE, euint32, externalEuint32 } from "@fhevm/solidity/lib/FHE.sol";
+import { FHE, euint32, ebool, externalEuint32 } from "@fhevm/solidity/lib/FHE.sol";
 import { ZamaEthereumConfig } from "@fhevm/solidity/config/ZamaConfig.sol";
 
 /// @title EqualityComparison
@@ -20,7 +20,7 @@ contract EqualityComparison is ZamaEthereumConfig {
   /// @notice Initialize with target value
   /// @param target Initial encrypted target
   /// @param inputProof Zero-knowledge proof
-  constructor(externalEuint32 target, bytes calldata inputProof) {
+  constructor(externalEuint32 target, bytes memory inputProof) {
     euint32 value = FHE.fromExternal(target, inputProof);
     encryptedTarget = value;
 
@@ -38,22 +38,24 @@ contract EqualityComparison is ZamaEthereumConfig {
   ///      - Only user can decrypt result
   function checkEquality(externalEuint32 encryptedGuess, bytes calldata inputProof)
     external
-    returns (bool)
+    returns (ebool)
   {
     // Convert user's guess
     euint32 guess = FHE.fromExternal(encryptedGuess, inputProof);
 
     // ✅ Perform encrypted equality check
     // Result is encrypted - tells user if guess matches
-    bool isEqual = FHE.eq(encryptedTarget, guess);
+    ebool isEqual = FHE.eq(encryptedTarget, guess);
 
     // Track attempt
     guessCount[msg.sender]++;
 
     emit EqualityChecked(msg.sender);
 
-    // Note: In practice, isEqual would be encrypted
-    // For this example, returning plain boolean for testing
+    // Grant permissions for result
+    FHE.allowThis(isEqual);
+    FHE.allow(isEqual, msg.sender);
+
     return isEqual;
   }
 
@@ -79,19 +81,22 @@ contract EqualityComparison is ZamaEthereumConfig {
   /// @param encryptedB Second encrypted value
   /// @param proofA Proof for first value
   /// @param proofB Proof for second value
-  /// @return Whether they are equal
+  /// @return Whether they are equal (encrypted)
   function compareValues(
     externalEuint32 encryptedA,
     externalEuint32 encryptedB,
     bytes calldata proofA,
     bytes calldata proofB
-  ) external pure returns (bool) {
+  ) external returns (ebool) {
     // Convert both values
     euint32 valueA = FHE.fromExternal(encryptedA, proofA);
     euint32 valueB = FHE.fromExternal(encryptedB, proofB);
 
     // ✅ Compare encrypted values
-    return FHE.eq(valueA, valueB);
+    ebool result = FHE.eq(valueA, valueB);
+    FHE.allowThis(result);
+    FHE.allow(result, msg.sender);
+    return result;
   }
 
   /// @notice Demonstrate conditional logic on encrypted values
@@ -100,17 +105,17 @@ contract EqualityComparison is ZamaEthereumConfig {
   /// @dev Shows pattern for encrypted conditional logic
   function conditionalOperation(externalEuint32 encryptedValue, bytes calldata inputProof)
     external
-    returns (bool)
+    returns (ebool)
   {
     euint32 value = FHE.fromExternal(encryptedValue, inputProof);
 
     // ✅ Can perform encrypted comparisons
-    bool isGreater = FHE.gt(value, encryptedTarget);
-    bool isLess = FHE.lt(value, encryptedTarget);
-    bool isEqual = FHE.eq(value, encryptedTarget);
+    ebool isEqual = FHE.eq(value, encryptedTarget);
 
     // These comparisons happen on encrypted data
     // Results can drive contract logic
+    FHE.allowThis(isEqual);
+    FHE.allow(isEqual, msg.sender);
     return isEqual;
   }
 

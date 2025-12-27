@@ -2,9 +2,9 @@
 pragma solidity ^0.8.24;
 
 import { FHE, euint32, euint64, ebool } from "@fhevm/solidity/lib/FHE.sol";
-import { SepoliaConfig } from "@fhevm/solidity/config/ZamaConfig.sol";
+import { ZamaEthereumConfig } from "@fhevm/solidity/config/ZamaConfig.sol";
 
-contract AnonymousMembership is SepoliaConfig {
+contract AnonymousMembership is ZamaEthereumConfig {
 
     address public owner;
     uint32 public totalMembers;
@@ -318,6 +318,6 @@ contract AnonymousMembership is SepoliaConfig {
 
     // Generate anonymous registration token (owner only)
     function generateAnonymousToken() external onlyOwner view returns (bytes32) {
-        return keccak256(abi.encodePacked(block.timestamp, block.difficulty, msg.sender));
+        return keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender));
     }
 }

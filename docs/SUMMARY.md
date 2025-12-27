@@ -13,6 +13,8 @@
 - [Getting Started Guide](getting-started.md)
 - [FHE Concepts](concepts/fhe-fundamentals.md)
 - [FHEVM Patterns](concepts/fhevm-patterns.md)
+- [Project Status Report](../PROJECT_COMPLETION_REPORT.md)
+- [Developer Guide](../DEVELOPER_GUIDE.md)
 
 ## Basic Examples
 
@@ -41,9 +43,12 @@
 
 ## Advanced Topics
 
+- [FHE Counter Comparison](guides/fhe-counter-comparison.md)
 - [Handle Management](guides/handles.md)
 - [Input Proofs](guides/input-proofs.md)
 - [Permission Management](guides/permissions.md)
+- [Basic Examples Guide](guides/basic-examples.md)
+- [Anti-Patterns to Avoid](guides/anti-patterns.md)
 
 ## API Reference
 
