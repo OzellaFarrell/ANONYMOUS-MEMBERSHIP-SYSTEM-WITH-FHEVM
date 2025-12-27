@@ -1,7 +1,12 @@
 import { HardhatUserConfig } from "hardhat/config";
-import "@nomicfoundation/hardhat-toolbox";
+import "@nomicfoundation/hardhat-ethers";
+import "@nomicfoundation/hardhat-chai-matchers";
+import "@nomicfoundation/hardhat-verify";
+import "@typechain/hardhat";
 import "@fhevm/hardhat-plugin";
 import "hardhat-deploy";
+import "hardhat-gas-reporter";
+import "solidity-coverage";
 
 const config: HardhatUserConfig = {
   solidity: {
